@@ -1,0 +1,63 @@
+version: '3.4'
+
+services:
+  db:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Testing1122
+    ports:
+      - 15789:1433
+    volumes:
+      - C:\WorkSpace\mySql:/var/opt/mssql/data
+  freakyfashionservices.catalog:
+    image: ${DOCKER_REGISTRY-}freakyfashionservicescatalog
+    build:
+      context: .
+      dockerfile: FreakyFashionServices.Catalog/Dockerfile
+    depends_on:
+      - db
+
+
+  freakyfashionservices.basket:
+    image: ${DOCKER_REGISTRY-}freakyfashionservicesbasket
+    build:
+      context: .
+      dockerfile: FreakyFashionServices.Basket/Dockerfile
+  redis: 
+    image: redis
+
+  freakyfashionservices.productprice:
+    image: ${DOCKER_REGISTRY-}freakyfashionservicesproductprice
+    build:
+      context: .
+      dockerfile: FreakyFashionServices.ProductPrice/Dockerfile
+
+
+  freakyfashionservices.gateway:
+    image: ${DOCKER_REGISTRY-}freakyfashionservicesgateway
+    build:
+      context: .
+      dockerfile: FreakyFashionServices.Gateway/Dockerfile
+    ports:
+      - 5006:80
+      - 5007:443
+
+  freakyfashionservices.orderregistration:
+    image: ${DOCKER_REGISTRY-}freakyfashionservicesorderregistration
+    build:
+      context: .
+      dockerfile: FreakyFashionServices.OrderRegistration/Dockerfile
+
+  rabbit:
+    image: rabbitmq:3-management
+    ports:
+      - 15672:15672
+      - 5010:5672
+  dborder:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Testing1122
+    ports:
+      - 15799:1433
